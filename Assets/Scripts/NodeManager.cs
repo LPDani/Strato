@@ -38,7 +38,7 @@ public class NodeManager : MonoBehaviour {
         {
             //Debug.Log(nodeObject.transform.right);
             if(node != null)
-                Instantiate(nodeObject, node.nodePosition, Quaternion.Euler( new Vector3(90,0,0) ) );
+                Instantiate(nodeObject, node.nodePosition, Quaternion.Euler( new Vector3(0,0,0) ) );
         }
     }
    
