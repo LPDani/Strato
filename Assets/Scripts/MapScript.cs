@@ -98,8 +98,27 @@ public class MapScript : MonoBehaviour {
 				diffZ = 0f;
 			}
 		}
+        
+        Vector3 ret = new Vector3(0, 0, 0);
 
-        return new Vector3((newX + diffX) - 0.5f, vector.y, (newZ + diffZ) + 0.5f);
+        if ((newX + diffX) > 5 && (newZ + diffZ) < 5)
+            ret = new Vector3((newX + diffX) - 0.5f, vector.y, (newZ + diffZ) + 0.5f);
+        if ((newX + diffX) < 5 && (newZ + diffZ) < 5)
+            ret =  new Vector3((newX + diffX) + 0.5f, vector.y, (newZ + diffZ) + 0.5f);
+        if ((newX + diffX) > 5 && (newZ + diffZ) > 5)
+            ret =  new Vector3((newX + diffX) - 0.5f, vector.y, (newZ + diffZ) - 0.5f);
+        if ((newX + diffX) < 5 && (newZ + diffZ) > 5)
+            ret =  new Vector3((newX + diffX) + 0.5f, vector.y, (newZ + diffZ) - 0.5f);
+        if ((newX + diffX) == 5 && (newZ + diffZ) == 5)
+            ret = new Vector3(5, vector.y, 5);
+        
+        //return new Vector3((newX + diffX), vector.y, (newZ + diffZ));
+        if (ret.x == 0 && ret.y == 0 && ret.z == 0)
+        {
+            Debug.Log(Input.mousePosition.ToString());
+        }
+
+        return ret;
 	}
 
     void OnMouseOver()
@@ -126,13 +145,52 @@ public class MapScript : MonoBehaviour {
             if (Physics.Raycast(ray, out hit))
             {
                 Vector3 asd = CalculatePositionOnGrid(hit.point);
-                //itt adjuk hozzá a mátrix, x,y koordinátájához, magyarul az asd vektor x, és z koordinátájból számoljuk az x y-t
-                int indexX = (int)((asd.x + 0.5f) / (1f/2f)); //matrixban az elso index
-                // a Z a matrixban levö elemektol fugg, ha ott azon az indexen van már elem akkor az Y n+1 lesz
-                int indexZ = (int)((asd.z - 0.5f) / (1f/2f));
-                GameObject a = (GameObject)Instantiate(previewObject, asd , Quaternion.Euler(new Vector3(0, 0, 0)));
-                Debug.Log("Index: " + indexX + ", " + indexZ);
+                //itt adjuk hozzá a mátrix, x,y koordinátájához, magyarul az asd vektor x, és z koordinátájból számoljuk az x y-t   
+                if(PutDownElement(asd))
+                { 
+                    GameObject afsgdn = (GameObject)Instantiate(previewObject, asd , Quaternion.Euler(new Vector3(0, 0, 0)));
+                }
             }
+    }
+
+    // a bal felso (kek) sarok szerint nezi most az ertekeket
+    bool PutDownElement(Vector3 asd)
+    {
+/*        
+        if (asd.x > 5 && asd.z < 5)
+        {
+            asd.x += 0.5f;
+            asd.z -= 0.5f;
+        }
+        if (asd.x < 5 && asd.z < 5)
+        {
+            asd.x -= 0.5f;
+            asd.z -= 0.5f;
+        }
+        if (asd.x > 5 && asd.z > 5)
+        {
+            asd.x += 0.5f;
+            asd.z += 0.5f;
+        }
+        if (asd.x < 5 && asd.z > 5)
+        {
+            asd.x -= 0.5f;
+            asd.z += 0.5f;
+        }
+        if (asd.x == 5 && asd.z == 5)
+        {
+            asd.x = 5;
+            asd.z = 5;
+        }
+*/
+        
+        int indexX = ((int) ((asd.x * 2))) - 1 ;
+        // a Z a matrixban levö elemektol fugg, ha ott azon az indexen van már elem akkor az Y n+1 lesz
+        int indexZ = ((int)((asd.z * 2))) - 1;
+        Debug.Log("Index: " + indexX + ", " + indexZ);
+
+        return GameObject.Find("GameLogicObject").GetComponent<GameLogic>().PutElementInMatrix(indexX, indexZ);
+        
     }
 
     void OnMouseExit()
