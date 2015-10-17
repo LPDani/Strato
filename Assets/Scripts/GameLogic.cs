@@ -14,7 +14,7 @@ public class GameLogic : MonoBehaviour {
             this.isFree = free;
         }
         public string Playername { get; set; }
-        public int TileColor { get; set; } // 0 - fekete, 1 - piros, 2 - zold
+        public int TileColor { get; set; } // 0 - zold, 1 - fekete, 2 - piros
         public bool isFree { get; set; }
 
     }
@@ -34,34 +34,88 @@ public class GameLogic : MonoBehaviour {
         public Tile t3;
     }
 
+    // GUI ELEMEK
+    public GameObject T1CG; // tile1colorGreen
+    public GameObject T1CB; // tile1colorGreen
+    public GameObject T1CR; // tile1colorGreen
+
+    public GameObject T2CG; // tile2colorGreen
+    public GameObject T2CB; // tile2colorGreen
+    public GameObject T2CR; // tile2colorGreen
+
+    public GameObject T3CG; // tile3colorGreen
+    public GameObject T3CB; // tile3colorGreen
+    public GameObject T3CR; // tile3colorGreen
+
+    public UnityEngine.UI.Text remainingGC; //green count
+    public UnityEngine.UI.Text remainingRC;
+
+    public GameObject gameEndPanel;
+    public UnityEngine.UI.Text winnerText;
+
+    //GAME LOGIC 
     Tile[, ,] gridMap;
     List<playersTile> greenPlayerTiles;
     List<playersTile> redPlayerTiles;
     playersTile nextPlayerTile;
+    string actualPlayer;
 
-    public GameObject T1CB; // tile1colorGreen
-    public GameObject T1CG; // tile1colorGreen
-    public GameObject T1CR; // tile1colorGreen
-
-    public GameObject T2CB; // tile2colorGreen
-    public GameObject T2CG; // tile2colorGreen
-    public GameObject T2CR; // tile2colorGreen
-
-    public GameObject T3CB; // tile3colorGreen
-    public GameObject T3CG; // tile3colorGreen
-    public GameObject T3CR; // tile3colorGreen
+    void Awake()
+    {
+       gameEndPanel.SetActive(false);
+       chooseStart();
+    }
 	// Use this for initialization
 	void Start () {
 	    gridMap = new Tile[20, 20, 3];
         greenPlayerTiles = new List<playersTile>();
         redPlayerTiles = new List<playersTile>();
         setMapFree();
-        InitDecks(); 
+        InitDecks();
+        updateText();
 	}
+
+    private void chooseStart ()
+    {
+        int res = Random.Range(0, 2); // 0 v 1
+        if (res == 1)
+            actualPlayer = "G";
+        else
+            actualPlayer = "R";
+    }
+
+    private void updateText()
+    {
+        remainingGC.text = "Remaining tiles: " + greenPlayerTiles.Count;
+        remainingRC.text = "Remaining tiles: " + redPlayerTiles.Count;
+    }
+
+    void Update()
+    {
+        updateText();
+
+    }
+    
+    void FixedUpdate()
+    {
+        finishGame();
+    }
+
+    private void finishGame()
+    {
+        if (redPlayerTiles.Count == 0 && greenPlayerTiles.Count == 0 && Time.timeScale != 0 )
+        {
+            winnerText.text += actualPlayer;
+            gameEndPanel.SetActive(true);
+            GameObject.Find("Map_v2").GetComponent<BoxCollider>().enabled = false;
+            Time.timeScale = 0;
+            UnityEngine.Time.timeScale = 0;
+        }
+    }
 
     private void InitDecks()
     {
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 1; i++)
         {
             //itt majd kell vizsgálni hogy milyen szinüenk a tileok, pl ne legyen csak prios
             playersTile temp = new playersTile();
@@ -75,16 +129,16 @@ public class GameLogic : MonoBehaviour {
             greenPlayerTiles.Add(temp);
         }
 
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 1; i++)
         {
             //itt majd kell vizsgálni hogy milyen szinüenk a tileok, pl ne legyen csak zold
             playersTile temp = new playersTile();
             Tile temp2 = new Tile();
-            temp2.TileColor = Random.Range(0, 2);
+            temp2.TileColor = Random.Range(1, 3);
             temp.t1 = temp2;
-            temp2.TileColor = Random.Range(0, 2);
+            temp2.TileColor = Random.Range(1, 3);
             temp.t2 = temp2;
-            temp2.TileColor = Random.Range(0, 2);
+            temp2.TileColor = Random.Range(1, 3);
             temp.t3 = temp2;
             redPlayerTiles.Add(temp);
         }
@@ -104,9 +158,6 @@ public class GameLogic : MonoBehaviour {
         }
     }
 	
-	// Update is called once per frame
-	void Update () {
-	}
 
     public bool PutElementInMatrix(int indexX, int indexY)
     {
@@ -130,58 +181,59 @@ public class GameLogic : MonoBehaviour {
 
     public void SetNextElementToPreviewElement()
     {
-        // meg kell nézni hogy a playerTile-ok array üres-e
+        List<playersTile> tiles = new List<playersTile>();
+        if (actualPlayer == "G")
+            tiles = greenPlayerTiles;
+        else
+            tiles = redPlayerTiles;
 
-        /*
-        Material[] a = GameObject.Find("TileColor1").GetComponent<MeshRenderer>().materials;
-        GameObject.Find("TileColor1").GetComponent<MeshRenderer>().material = a[greenPlayerTiles[0].t1.TileColor];
-        GameObject.Find("TileColor2").GetComponent<MeshRenderer>().material = a[greenPlayerTiles[0].t2.TileColor];
-        GameObject.Find("TileColor3").GetComponent<MeshRenderer>().material = a[greenPlayerTiles[0].t3.TileColor];
-        */
+        if (tiles.Count == 0)
+            return;
+
         //TileColor1Green
-        switch (greenPlayerTiles[0].t1.TileColor)
+        switch (tiles[0].t1.TileColor)
         {
             case 0:
-                T1CB.SetActive(true);
-                T1CG.SetActive(false);
+                T1CG.SetActive(true);
+                T1CB.SetActive(false);
                 T1CR.SetActive(false);
                 break;
             case 1:
-                T1CB.SetActive(false);
-                T1CG.SetActive(true);
+                T1CG.SetActive(false);
+                T1CB.SetActive(true);
                 T1CR.SetActive(false);
                 break;
             case 2:
-                T1CB.SetActive(false);
                 T1CG.SetActive(false);
+                T1CB.SetActive(false);
                 T1CR.SetActive(true);
                 break;
             default:
                 break;
         }
 
-        switch (greenPlayerTiles[0].t2.TileColor)
+        switch (tiles[0].t2.TileColor)
         {
             case 0:
-                T2CB.SetActive(true);
-                T2CG.SetActive(false);
+                T2CG.SetActive(true);
+                T2CB.SetActive(false);
                 T2CR.SetActive(false);
                 break;
             case 1:
-                T2CB.SetActive(false);
-                T2CG.SetActive(true);
+                T2CG.SetActive(false);
+                T2CB.SetActive(true);
                 T2CR.SetActive(false);
                 break;
             case 2:
-                T2CB.SetActive(false);
                 T2CG.SetActive(false);
+                T2CB.SetActive(false);
                 T2CR.SetActive(true);
                 break;
             default:
                 break;
         }
 
-        switch (greenPlayerTiles[0].t3.TileColor)
+        switch (tiles[0].t3.TileColor)
         {
             case 0:
                 T3CB.SetActive(true);
@@ -201,7 +253,30 @@ public class GameLogic : MonoBehaviour {
             default:
                 break;
         }
-        nextPlayerTile = greenPlayerTiles[0];
-        greenPlayerTiles.RemoveAt(0);
+
+        nextPlayerTile = tiles[0];
+
+    }
+
+    public void SwitchPlayer()
+    {
+        if (actualPlayer == "G")
+        {
+            actualPlayer = "R";
+            return;
+        }
+        if (actualPlayer == "R")
+        {
+            actualPlayer = "G";
+            return;
+        }
+    }
+
+    public void RemoveFirstTile()
+    {
+        if (actualPlayer == "G")
+            greenPlayerTiles.RemoveAt(0);
+        else
+            redPlayerTiles.RemoveAt(0);
     }
 }

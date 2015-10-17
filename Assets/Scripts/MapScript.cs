@@ -46,30 +46,11 @@ public class MapScript : MonoBehaviour {
 		
 		if ( diffX > 0.5 )
 		{
-			/*
-            if ( diffX >= 0.75 )
-			{
-				diffX = 1f;
-			}
-			else
-			{
-				diffX = 0.5f;
-			}
-            */
+
             diffX = 1;
 		}
 		else
 		{
-            /*
-			if ( diffX >= 0.25 )
-			{
-				diffX = 0.5f;
-			}
-			else
-			{
-				diffX = 0f;
-			}
-            */
             diffX = 0;
 		}
 
@@ -85,55 +66,15 @@ public class MapScript : MonoBehaviour {
 		
 		if ( diffZ < 0.5 )
 		{
-            /*
-			if ( diffZ >= 0.75 )
-			{
-				diffZ = 1f;
-			}
-			else
-			{
-				diffZ = 0.5f;
-			}
-            */
+            
             diffZ = 0;
 		}
 		else
 		{
-            /*
-			if ( diffZ >= 0.25 )
-			{
-				diffZ = 0.5f;
-			}
-			else
-			{
-				diffZ = 0f;
-			}
-            */
             diffZ = 1;
 		}
-        /*
-        Vector3 ret = new Vector3(0, 0, 0);
 
-        if ((newX + diffX) > 10 && (newZ + diffZ) < 10)
-            ret = new Vector3((newX + diffX) - 1f, vector.y, (newZ + diffZ) + 1f);
-        if ((newX + diffX) < 10 && (newZ + diffZ) < 10)
-            ret =  new Vector3((newX + diffX) + 1f, vector.y, (newZ + diffZ) + 1f);
-        if ((newX + diffX) > 10 && (newZ + diffZ) > 10)
-            ret =  new Vector3((newX + diffX) - 1f, vector.y, (newZ + diffZ) - 1f);
-        if ((newX + diffX) < 10 && (newZ + diffZ) > 10)
-            ret =  new Vector3((newX + diffX) + 1f, vector.y, (newZ + diffZ) - 1f);
-        if ((newX + diffX) == 10 && (newZ + diffZ) == 10)
-            ret = new Vector3(10, vector.y, 10);
-       */
-        return new Vector3((newX + diffX), vector.y, (newZ + diffZ));
-        /*
-        if (ret.x == 0 && ret.y == 0 && ret.z == 0)
-        {
-            Debug.Log(Input.mousePosition.ToString());
-        }
-
-        return ret;
-   */      
+        return new Vector3((newX + diffX), vector.y, (newZ + diffZ));    
 	}
 
     void OnMouseOver()
@@ -148,7 +89,6 @@ public class MapScript : MonoBehaviour {
                 Vector3 asd = CalculatePositionOnGrid(hit.point);
                 previewObject.transform.position = asd;
                 previewObject.SetActive(true);
-				Debug.Log("asd: " + asd);
                 //Debug.Log("mouse: " + hit.point);
 			}
 			
@@ -162,12 +102,12 @@ public class MapScript : MonoBehaviour {
             if (Physics.Raycast(ray, out hit))
             {
                 Vector3 asd = CalculatePositionOnGrid(hit.point);
-                Debug.Log("asd: " + asd);
-                Debug.Log("mouse: " + hit.point);
                 //itt adjuk hozzá a mátrix, x,y koordinátájához, magyarul az asd vektor x, és z koordinátájból számoljuk az x y-t   
                 if(PutDownElement(asd))
                 { 
                     GameObject afsgdn = (GameObject)Instantiate(previewObject, asd , Quaternion.Euler(new Vector3(0, 0, 0)));
+                    GameObject.Find("GameLogicObject").GetComponent<GameLogic>().RemoveFirstTile();
+                    GameObject.Find("GameLogicObject").GetComponent<GameLogic>().SwitchPlayer();
                     GameObject.Find("GameLogicObject").GetComponent<GameLogic>().SetNextElementToPreviewElement();
                 }
             }
